@@ -13,9 +13,10 @@ provider "aws" {
 }
 
 # Create an EKS Cluster
+
 resource "aws_eks_cluster" "eks_cluster" {
   name     = "example-eks-cluster"
-  version = "1.31" # Specify your desired Kubernetes version
+  version = "1.30" # Specify your desired Kubernetes version
 
   role_arn = aws_iam_role.eks_cluster_role.arn
 
