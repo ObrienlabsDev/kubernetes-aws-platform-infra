@@ -3,7 +3,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 4.0"
+      version = "~> 5.61"#4.0"
     }
   }
 }
@@ -13,8 +13,10 @@ provider "aws" {
 }
 
 # Create an EKS Cluster
-
+# https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_cluster
 resource "aws_eks_cluster" "eks_cluster" {
+  #depends_on = [aws_cloudwatch_log_group.example]
+  #enabled_cluster_log_types = ["api", "audit"]
   name     = "example-eks-cluster"
   version = "1.30" # Specify your desired Kubernetes version
 
@@ -30,6 +32,14 @@ resource "aws_eks_cluster" "eks_cluster" {
     public_access_cidrs    = ["0.0.0.0/0"] # Limit this in production
   }
 
+# https://docs.aws.amazon.com/eks/latest/userguide/disable-extended-support.html
+# aws eks update-cluster-config --name example-eks-cluster --upgrade-policy supportType=STANDARD --region us-east-1
+
+  #upgrade_policy {
+  #  support_type = "STANDARD"
+  #}
+  
+
   tags = {
     Name = "eks-cluster"
   }
@@ -38,6 +48,12 @@ resource "aws_eks_cluster" "eks_cluster" {
   enabled_cluster_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 }
 
+/*resource "aws_cloudwatch_log_group" "example" {
+  # The log group name format is /aws/eks/<cluster-name>/cluster
+  # Reference: https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html
+  name              = "/aws/eks/${var.cluster_name}/cluster"
+  retention_in_days = 7
+}*/
 # Create an IAM Role for the EKS Cluster
 resource "aws_iam_role" "eks_cluster_role" {
   name = "eks-cluster-role"
